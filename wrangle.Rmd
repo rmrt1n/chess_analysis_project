@@ -8,6 +8,7 @@ output: html_notebook
 library(readr)
 library(dplyr)
 library(tidyr)
+library(stringr)
 ```
 
 ### import & view data
@@ -43,13 +44,36 @@ df <- df %>%
                )
              )
   ) %>%
-  select(Color, Rating, Opponent, Opponent_rating, Result, Moves, Year) %>%
+  mutate(Opening = str_replace_all(Opening, "(?<=[0-9+]\\.) ", "")) %>%
+  mutate(Opening = str_replace_all(Opening, "(?<=[0-9+]) ", "")) %>%
+  mutate(Opening = if_else(
+                     str_detect(Opening, ":") == TRUE,
+                     str_extract(Opening, "(?<=[0-9+] ).*?(?=\\:)"),
+                     if_else(
+                       str_detect(Opening, "with") == TRUE,
+                       str_extract(Opening, "(?<=[0-9+] ).*?(?=with)"),
+                       str_extract(Opening, "(?<=[0-9+] ).*?$")
+                     )
+                   )
+  ) %>%
+  mutate(Opening = if_else(
+                     str_detect(Opening, "with") == TRUE,
+                     str_extract(Opening, ".*(?=with)"),
+                     Opening
+                   )
+  ) %>%
+  select(
+    Color, Rating, Opponent, Opponent_rating,
+    Result, Opening, Moves, Year
+  ) %>%
   mutate(Rating = str_extract(Rating, "(?<=\\().*?(?=\\))")) %>%
-  mutate(Opponent_rating = str_extract(Opponent_rating, "(?<=\\().*?(?=\\))")) %>%
-  mutate_at(c("Color", "Result"), as.factor) %>%
+  mutate(
+    Opponent_rating = str_extract(Opponent_rating, "(?<=\\().*?(?=\\))")
+  ) %>%
+  mutate_at(c("Color", "Result", "Opening"), as.factor) %>%
   mutate_at(c("Rating", "Opponent_rating"), as.numeric)
 
-head(df)
+head(df, 10)
 ```
 #### New column descriptions:
 - Color =  Hikaru's piece color
@@ -60,8 +84,10 @@ head(df)
     * Win = Hikaru won the game
     * Loss = Hikaru loss the game
     * Draw = The game ends in a draw
+- Opening = the opening played in the game
 - Moves = The ammount of moves played
 - Year = The year the game is played
+
 
 ### write to csv
 ```{r}

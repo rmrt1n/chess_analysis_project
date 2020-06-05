@@ -6,14 +6,13 @@ library(stringr)
 
 
 scrape <- function(url) {
-  page <- html_session(url)
-
-  df <- page %>%
+  df <- html_session(url) %>%
     html_node("table") %>%
     html_table() %>%
     select(-5) %>%
     filter(str_count(Players, "\\(.*?\\)") == 2) %>%
     mutate(Players = str_replace_all(Players, "\n", "")) %>%
+    mutate(Opening = str_extract(Players, "(?=1\\.).*")) %>%
     separate(Players,
              into = c("Player 1", "Player 2"),
              sep = "(?<=\\)).*?(?=[A-Z])")
