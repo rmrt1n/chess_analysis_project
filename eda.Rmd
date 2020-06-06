@@ -8,6 +8,7 @@ library(readr)
 library(dplyr)
 library(magrittr)
 library(ggplot2)
+library(gridExtra)
 ```
 
 ```{r message = FALSE}
@@ -15,10 +16,10 @@ df <- read_csv("cleaned_data.csv")
 ```
 
 ### questions to answer
-1. What is his win percentage overall, grouped by color?
+1. *What is his win percentage overall, grouped by color?*
 2. Which is his best opening overall, grouped by color?
-3. Which opening does he play the most overall, grouped by color?
-4. Does he lose more against higher rated opponents?
+3. *Which opening does he play the most overall, grouped by color?*
+4. *Does he lose more against higher rated opponents?*
 5. What is the average move count in his games?
 6. Which year did he perform the best in?
 7. Who does he play with most often?
@@ -26,7 +27,7 @@ df <- read_csv("cleaned_data.csv")
 ### what is his win percentage overall & grouped by color?
 As white, H.N wins more, loses & draws less than as black. As black
 he loses slightly more often than wins.
-```{r include=T}
+```{r include=F}
 overall_win <- df %>%
   group_by(Result) %>%
   summarise(count = n()) %>%
@@ -52,16 +53,101 @@ winrate %>% ggplot(aes(x = Color, y = Percentage, fill = Result)) +
   labs(title = "Ratio of Wins, Losses & Draws by Color")
 ```
 
-### which openings has higher winrates overall & grouped by color?
-```{r}
+### Which opening does he play the most overall & grouped by color?
+```{r include=F}
+# openings and their game count
 overall_op <- df %>%
   group_by(Opening) %>%
-  summarise(n_games = n()) %>%
-  filter(n_games > 10) %>%
-  arrange(desc(n_games))
+  summarise(N_games = n()) %>%
+  arrange(desc(N_games))
 
-overall_op
+# top 10 most played openings
+top_op <- head(overall_op, 10)
+top_op$Opening <- factor(
+                    top_op$Opening,
+                    levels = top_op$Opening[order(top_op$N_games)]
+                  )
+top_op %>%
+  ggplot(aes(x = Opening, y = N_games)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  ggtitle("Most Played Openings by Hikaru Nakamura")
+
+
+# top 10 most played openings grouped by color
+top_by_color <- df %>%
+  group_by(Color, Opening) %>%
+  summarise(N_games = n()) %>%
+  top_n(n = 10, wt = N_games)
+
+# top 10 most played openings by white
+top_w <- head(top_by_color, 10)
+top_w$Opening = factor(
+                  top_w$Opening,
+                  levels = top_w$Opening[order(top_w$N_games)]
+                )
+white <- top_w %>%
+  ggplot(aes(x = Opening, y = N_games)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  ggtitle("Most played openings as white")
+
+# top 10 most played openings by black
+top_b <- tail(top_by_color, 10)
+top_b$Opening <- factor(
+                   top_b$Opening,
+                   levels = top_b$Opening[order(top_b$N_games)]
+                 )
+black <- top_b %>%
+  ggplot(aes(x = Opening, y = N_games)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  ggtitle("Most played openings as black")
+
+grid.arrange(white, black)
+```
+
+
+### Does he lose more against higher rated opponents?
+it seems that HN wins more often than loses even against higher rated
+opponents. the majority of his games against higher rated opponents 
+ended in a draw.
+```{r include=F}
+vs_high <- df %>%
+  mutate(Vs_higher = if_else(Opponent_rating > Rating, "yes","no")) %>%
+  group_by(Vs_higher, Result) %>%
+  summarise(count = n()) %>%
+  mutate(Percentage = count / sum(count) * 100) %>%
+  select(-count) %>%
+  arrange(desc(Vs_higher))
+
+vs_high %>% ggplot(aes(x = Vs_higher, y = Percentage, fill = Result)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  coord_flip() +
+  labs(
+    title = "Ratio of Wins, Losses & Draws against higher/lower opponents",
+    x = "VS higher rated opponents?"
+       )
+```
+
+### which openings has higher winrates?
+```{r}
+
+wr <- df %>%
+  group_by(Opening, Result) %>%
+  summarise(win_count = n()) %>%
+  filter(Result == "Win") %>%
+  select(-Result) %>%
+  inner_join(overall_op) %>%
+  arrange(desc(N_games))
+
   
-
-
+winrt <- df %>%
+  group_by(Opening, Result) %>%
+  summarise(win_count = n()) %>%
+  filter(Result == "Win") %>%
+  select(-Result) %>%
+  inner_join(overall_op) %>%
+  mutate(winrate = win_count / N_games * 100) %>%
+  arrange(desc(winrate))
 ```
