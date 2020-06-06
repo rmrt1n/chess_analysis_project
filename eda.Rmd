@@ -1,0 +1,63 @@
+---
+title: "EDA"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+library(GGally)
+```
+
+```{r message = FALSE}
+df <- read_csv("cleaned_data.csv")
+```
+
+### questions to answer
+1. What is his win percentage overall, grouped by color?
+2. Which is his best opening overall, grouped by color?
+3. Which opening does he play the most overall, grouped by color?
+4. Does he lose more against higher rated opponents?
+5. What is the average move count in his games?
+6. Which year did he perform the best in?
+7. Who does he play with most often?
+
+### what is his win percentage overall & grouped by color?
+As white, H.N wins more, loses & draws less than as black. As black
+he loses slightly more often than wins.
+```{r include=F}
+overall_win <- df %>%
+  group_by(Result) %>%
+  summarise(count = n()) %>%
+  mutate(Percentage = count / sum(count) * 100) %>%
+  select(-count) 
+overall_win
+ 
+overall_win %>% ggplot(aes(x = Result, y = Percentage)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  labs(title = "Ratio of Wins, Losses & Draws overall")
+
+
+winrate <- df %>%
+  group_by(Color, Result) %>%
+  summarise(count = n()) %>%
+  mutate(Percentage = count / sum(count) * 100) %>%
+  select(-count) 
+winrate
+
+winrate %>% ggplot(aes(x = Color, y = Percentage, fill = Result)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  coord_flip() +
+  labs(title = "Ratio of Wins, Losses & Draws by Color")
+```
+
+### which openings has higher winrates overall & grouped by color?
+```{r}
+overall_op <- df %>%
+  group_by(Opening, Result)
+  
+
+
+```
