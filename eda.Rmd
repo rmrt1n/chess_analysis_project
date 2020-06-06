@@ -8,7 +8,6 @@ library(readr)
 library(dplyr)
 library(magrittr)
 library(ggplot2)
-library(GGally)
 ```
 
 ```{r message = FALSE}
@@ -27,7 +26,7 @@ df <- read_csv("cleaned_data.csv")
 ### what is his win percentage overall & grouped by color?
 As white, H.N wins more, loses & draws less than as black. As black
 he loses slightly more often than wins.
-```{r include=F}
+```{r include=T}
 overall_win <- df %>%
   group_by(Result) %>%
   summarise(count = n()) %>%
@@ -56,7 +55,12 @@ winrate %>% ggplot(aes(x = Color, y = Percentage, fill = Result)) +
 ### which openings has higher winrates overall & grouped by color?
 ```{r}
 overall_op <- df %>%
-  group_by(Opening, Result)
+  group_by(Opening) %>%
+  summarise(n_games = n()) %>%
+  filter(n_games > 10) %>%
+  arrange(desc(n_games))
+
+overall_op
   
 
 
