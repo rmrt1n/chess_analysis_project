@@ -19,31 +19,44 @@ head(df)
 ```
 
 #### questions to answer
-1. *What is his win percentage overall, grouped by color?*
+1. What is his win percentage overall & grouped by color?
 2. Which is his best opening overall, grouped by color?
-3. *Which opening does he play the most overall, grouped by color?*
-4. *Does he lose more against higher rated opponents?*
-5. *What is the average move count in his games?*
-6. *Which year did he perform the best in?*
-7. *Who does he play with most often?*
+3. Which opening does he play the most overall, grouped by color?
+4. Does he lose more against higher rated opponents?
+5. What is the average move count in his games?
+6. Which year did he perform the best in?
+7. Who does he play with most often?
 
-### What is his win percentage overall?
+### **1. What is His Win Percentage Overall?**
 ```{r echo=F, message = FALSE}
-# ratio of win, draw, loss
+# count of win, draw, loss
 overall_win <- df %>%
   group_by(Result) %>%
-  summarise(count = n()) %>%
-  mutate(Percentage = round(count / sum(count) * 100, 2)) %>%
-  select(-count) 
+  summarise(Count = n())
 
+# vars for inline code
+ngame <- summarise(df, n()) %>% as.character()
+wins <- overall_win[3, 2] %>% as.character()
+loss <- overall_win[2, 2] %>% as.character()
+draw <- overall_win[1, 2] %>% as.character()
+wr <- round(as.numeric(wins) / as.numeric(ngame) * 100, 2)
+
+# plot
 overall_win %>%
-  ggplot(aes(x = reorder(Result, -Percentage), y = Percentage)) +
+  ggplot(aes(x = reorder(Result, -Count), y = Count)) +
   geom_bar(stat = "identity", width = 0.6) +
   labs(
-    title = "Ratio of Wins, Losses & Draws overall",
+    title = "Comparison of number of wins, losses, and draws",
     x = "Result"
   )
-   
+```
+His win percentage is `r wr` %. Out of 
+`r ngame` games, `r wins` are wins, `r loss` are losses, and `r draw`
+are draws.  Most of his games ends in a win or a draw. 
+
+
+### **2. What is His Win Percentage Grouped by Color?**
+```{r echo = F, message = FALSE}
 # ratio of win, draw, loss by color
 winrate <- df %>%
   group_by(Color, Result) %>%
@@ -51,16 +64,26 @@ winrate <- df %>%
   mutate(Percentage = count / sum(count) * 100) %>%
   select(-count) 
 
-winrate %>% ggplot(aes(x = Color, y = Percentage, fill = Result)) +
-  geom_bar(stat = "identity",position = "fill", width = 0.6) +
+# vars for inline code
+w_wr <- round(winrate[6, 3], 2) %>% as.character()
+b_wr <- round(winrate[3, 3], 2) %>% as.character()
+
+# plot
+winrate %>%
+  ggplot(aes(x = Color, y = Percentage, fill = Result)) +
+  geom_bar(stat = "identity", position = "fill", width = 0.6) +
   coord_flip() +
   labs(
-    title = "Ratio of Wins, Losses & Draws by Color",
-    y = "Win:Loss:Draw"
+    title = "Ratio of Wins, Losses & Draws Grouped by Color",
+    y = "Win : Loss : Draw"
   )
 ```
+His win-rate as white is `r w_wr`, which is higher than his win-rate as  
+black `r b_wr`. Win to loss to draw ratio is roughly the same as white  
+or black.
 
-### Which opening does he play the most overall & grouped by color?
+
+### **3. Which Opening Does He Play the Most Overall?**
 ```{r echo = FALSE, message = FALSE}
 # openings and their game count
 overall_op <- df %>%
@@ -74,11 +97,14 @@ head(overall_op, 10) %>%
   geom_bar(stat = "identity") +
   coord_flip() +
   labs(
-    title = "Most Played Openings by Hikaru Nakamura",
+    title = "Most Played Openings Overall",
     x = "Opening",
     y = "Number of Games"
   )
+```
 
+### **4. Which Opening Does He Play the Most Grouped by Color?**
+```{r echo = FALSE, message = FALSE}
 # top 10 most played openings grouped by color
 top_by_color <- df %>%
   group_by(Color, Opening) %>%
@@ -91,7 +117,7 @@ white <- head(top_by_color, 10) %>%
   geom_bar(stat = "identity") +
   coord_flip() +
   labs(
-    title = "Most played openings as white",
+    title = "Most Played Openings as White",
     x = "Openings",
     y = "Number of Games"
   )
@@ -102,16 +128,19 @@ black <- tail(top_by_color, 10) %>%
   geom_bar(stat = "identity") +
   coord_flip() +
   labs(
-    title = "Most played openings as black",
+    title = "Most Played Openings as Black",
     x = "Openings",
     y = "Number of Games"
   )
 
 grid.arrange(white, black)
 ```
+It looks like the most played opening is the sicilian defense for both  
+white and black. This might happen because there are many variations of  
+the sicilian defense, but all of them are grouped together in the data.
 
 
-### Does he lose more against higher rated opponents?
+### **4. Does He Lose More Against Higher Rated Opponents?**
 ```{r echo = FALSE, message = FALSE}
 # results when playing against/not against higher rated opponents
 vs_high <- df %>%
@@ -230,5 +259,65 @@ tb <- table(op_res$Color, op_res$Opening, op_res$Result)
 # H1 = opening & color have an effect on result
 mantelhaen.test(tb)
 # reject null hypothesis 
+
+# top 10 op overal
+df %>%
+  filter(Opening %in% op_res$Opening) %>%
+  group_by(Opening, Result) %>%
+  summarise(Count = n()) %>%
+  mutate(Winrate = round(Count / sum(Count) * 100, 2)) %>%
+  filter(Result == "Win") %>%
+  select(-Count, -Result) %>%
+  arrange(desc(Winrate)) %>%
+  head(10) %>%
+  ggplot(aes(x = reorder(Opening, Winrate), y = Winrate)) +
+  geom_bar(stat = "Identity", width = 0.6) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(
+    title = "Top 10 Win-rates of Openings played by Hikaru Nakamura",
+    x = "Opening",
+    y = "Win-rate in percentages(%)"
+  )
+
+# top 10 white op
+df %>%
+  filter(Opening %in% x$Opening) %>%
+  group_by(Color, Opening, Result) %>%
+  summarise(Count = n()) %>%
+  mutate(Winrate = round(Count / sum(Count) * 100, 2)) %>%
+  filter(Result == "Win" & Color == "White") %>%
+  select(-Count, -Result) %>%
+  arrange(desc(Winrate)) %>%
+  head(10) %>%
+  ggplot(aes(x = reorder(Opening, Winrate), y = Winrate)) +
+  geom_bar(stat = "Identity", width = 0.6) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(
+    title = "Top 10 Win-rates of Openings Played as White",
+    x = "Opening",
+    y = "Win-rate in percentages(%)"
+  )
+
+# top 10 black op
+df %>%
+  filter(Opening %in% x$Opening) %>%
+  group_by(Color, Opening, Result) %>%
+  summarise(Count = n()) %>%
+  mutate(Winrate = round(Count / sum(Count) * 100, 2)) %>%
+  filter(Result == "Win" & Color == "Black") %>%
+  select(-Count, -Result) %>%
+  arrange(desc(Winrate)) %>%
+  head(10) %>%
+  ggplot(aes(x = reorder(Opening, Winrate), y = Winrate)) +
+  geom_bar(stat = "Identity", width = 0.6) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(
+    title = "Top 10 Win-rates of Openings Played as Black",
+    x = "Opening",
+    y = "Win-rate in percentages(%)"
+  )
 ```
 
