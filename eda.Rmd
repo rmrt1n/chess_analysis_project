@@ -209,3 +209,26 @@ df %>%
 ```
 
 ### which openings have higher winrates?
+
+
+```{r}
+# openings with game number > 20
+freq_op <- df %>%
+  group_by(Opening) %>%
+  summarise(count = n()) %>%
+  filter(count > 20)
+
+# colors, openings, results 
+op_res <- df %>%
+  select(Color, Opening, Result) %>%
+  filter(Opening %in% freq_op$Opening)
+
+# cochran-mantel-haenszel tes on op_res
+tb <- table(op_res$Color, op_res$Opening, op_res$Result)
+
+# H0 = opening & color have no effect on result
+# H1 = opening & color have an effect on result
+mantelhaen.test(tb)
+# reject null hypothesis 
+```
+
