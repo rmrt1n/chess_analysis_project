@@ -1,10 +1,16 @@
 ---
-title: "EDA"
-output: html_notebook
+title: "Exploratory Data Analysis of Hikaru Nakamura's Games"
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: hide
+    theme: paper
 ---
 
-### Load libraries
-```{r}
+## **Import Libraries**
+```{r echo = TRUE}
 library(readr)
 library(dplyr)
 library(magrittr)
@@ -12,23 +18,15 @@ library(ggplot2)
 library(gridExtra)
 ```
 
-### Import and view data
+## **Import and View Data**
 ```{r message = FALSE}
 df <- read_csv("cleaned_data.csv")
 head(df)
 ```
 
-#### questions to answer
-1. What is his win percentage overall & grouped by color?
-2. Which is his best opening overall, grouped by color?
-3. Which opening does he play the most overall, grouped by color?
-4. Does he lose more against higher rated opponents?
-5. What is the average move count in his games?
-6. Which year did he perform the best in?
-7. Who does he play with most often?
-
+## **Analysis**
 ### **1. What is His Win Percentage Overall?**
-```{r echo=F, message = FALSE}
+```{r}
 # count of win, draw, loss
 overall_win <- df %>%
   group_by(Result) %>%
@@ -50,13 +48,12 @@ overall_win %>%
     x = "Result"
   )
 ```
-His win percentage is `r wr` %. Out of 
-`r ngame` games, `r wins` are wins, `r loss` are losses, and `r draw`
-are draws.  Most of his games ends in a win or a draw. 
+His win percentage is `r wr` %. Out of `r ngame` games, `r wins` are wins, `r loss` are losses,
+and `r draw` are draws.  Most of his games end in either a win or a draw. 
 
 
 ### **2. What is His Win Percentage Grouped by Color?**
-```{r echo = F, message = FALSE}
+```{r}
 # ratio of win, draw, loss by color
 winrate <- df %>%
   group_by(Color, Result) %>%
@@ -78,13 +75,12 @@ winrate %>%
     y = "Win : Loss : Draw"
   )
 ```
-His win-rate as white is `r w_wr`, which is higher than his win-rate as  
-black `r b_wr`. Win to loss to draw ratio is roughly the same as white  
-or black.
+His win-rate as white is `r w_wr` %, which is higher than his win-rate as black `r b_wr` %. 
+Win to loss to draw ratio is roughly the same as white or black.
 
 
-### **3. Which Opening Does He Play the Most Overall?**
-```{r echo = FALSE, message = FALSE}
+### **3. Which Openings Does He Play the Most Overall?**
+```{r}
 # openings and their game count
 overall_op <- df %>%
   group_by(Opening) %>%
@@ -103,8 +99,8 @@ head(overall_op, 10) %>%
   )
 ```
 
-### **4. Which Opening Does He Play the Most Grouped by Color?**
-```{r echo = FALSE, message = FALSE}
+### **4. Which Openings Does He Play the Most Grouped by Color?**
+```{r}
 # top 10 most played openings grouped by color
 top_by_color <- df %>%
   group_by(Color, Opening) %>%
@@ -135,43 +131,62 @@ black <- tail(top_by_color, 10) %>%
 
 grid.arrange(white, black)
 ```
-It looks like the most played opening is the sicilian defense for both  
-white and black. This might happen because there are many variations of  
-the sicilian defense, but all of them are grouped together in the data.
+It looks like the most played opening is the sicilian defense for both white and black. This might happen 
+because there are many variations of the sicilian defense, but all of them are grouped together in the data.
 
 
-### **4. Does He Lose More Against Higher Rated Opponents?**
-```{r echo = FALSE, message = FALSE}
-# results when playing against/not against higher rated opponents
-vs_high <- df %>%
+### **5. Does He Lose More Against Higher Rated Opponents?**
+```{r}
+# results against/not-against higher rated opponents
+vs_higher <-df %>%
   mutate(Vs_higher = if_else(Opponent_rating > Rating, "yes","no")) %>%
   group_by(Vs_higher, Result) %>%
   summarise(count = n()) %>%
   mutate(Percentage = count / sum(count) * 100) %>%
   select(-count) %>%
-  arrange(desc(Vs_higher)) %>%
+  arrange(desc(Vs_higher))
+
+# vars for inline code
+highdraw <- round(vs_higher[1, 3], 2) %>% as.character()
+lowwin <- round(vs_higher[6, 3], 2) %>% as.character()
+
+#plot
+vs_higher %>%
   ggplot(aes(x = Vs_higher, y = Percentage, fill = Result)) +
   geom_bar(stat = "identity", width = 0.6) +
   coord_flip() +
   labs(
-    title = "Ratio of Wins, Losses & Draws against higher/lower opponents",
-    x = "VS higher-rated opponents?",
-    y = "Win:Loss:Draw"
-  )
+    title = "Ratio of Game Results Against & not Against Higher-Rated Opponents",
+    x = "Against Higher-Rated Opponents?",
+    y = "Win : Loss : Draw"
+  ) 
 ```
+Against higher-rated opponents, nearly half of his games end in a draw. More specifically 
+`r highdraw` %. His win-rate is only slightly higher than his lose rate. On the other hand, 
+`r lowwin` % of his games against lower-rated opponents are wins.
 
-### What is the average move count in his games & does move count affect the result of games?
-```{r echo = FALSE, message = FALSE}
+
+### **6. What is the Average Move Count in his Games?**
+```{r}
+# avg number of moves
+avg_mv <- round(mean(df$Moves), 2) %>% as.character()
+
 # move count distribution
 df %>%
   ggplot(aes(x = Moves)) +
   geom_histogram(binwidth = 5) +
   labs(
-    title = "distribution of move count of games",
-    x = "move count of games"
+    title = "Distribution of Number of Moves in a Game",
+    x = "Number of Moves",
+    y = "Count"
   )
+```
+The average number of moves of his games is `r avg_mv` moves.
 
-# avg moves for win/draw/loss
+
+### **7. Does the Number of Moves Effect Game Results?**
+```{r}
+# avg moves for win/draw/loss plot
 df %>%
   group_by(Result) %>%
   summarise(Mean_moves = mean(Moves)) %>%
@@ -183,11 +198,12 @@ df %>%
     y = "Average move count"
   )
 ```
+The average move count is roughly the same for wins, losses, and draws. Number of moves is 
+unlikely to effect game results.
 
-### Which year did he perform the best in?
-ratings start from 2003, the year he became a gm. his highest rating was
-in 2015.
-```{r echo = FALSE, message = FALSE}
+
+### **8. Which year did he perform the best in?**
+```{r}
 # highest rating of each year 2003-2020
 df %>%
   group_by(Year) %>%
@@ -197,13 +213,17 @@ df %>%
   geom_line() +
   scale_x_continuous(breaks = seq(2002, 2020, 2)) +
   labs(
-    title = "Yearly highest rating",
-    y = "Highest rating"
+    title = "Yearly Highest Rating from 2003 to mid 2020",
+    y = "Rating"
   )
-```
 
-### Who does he play with most often?
-```{r echo = FALSE, message = FALSE}
+max_rt <- max(df$Rating) %>% as.character()
+```
+This chart starts from 2003, the year he became a GM. His highest rating was `r max_rt` back in 2015.
+
+
+### **9. Who does he play with most often?**
+```{r}
 # top 10 most played opponents
 reg_opp <- df %>%
   group_by(Opponent) %>%
@@ -217,12 +237,15 @@ reg_opp %>%
   geom_bar(stat = "identity", width = 0.6) +
   coord_flip() +
   labs(
-    title = "Top 10 players he plays with most often",
+    title = "Top 10 Players He Plays with Most Often",
     x = "Opponent",
     y = "Number of games played"
   )
+```
 
-# w/d/l ratio against them
+### **10. What are Hikaru's Game Results Like Against Them?**
+```{r}
+# w/d/l ratio 
 df %>%
   group_by(Opponent, Result) %>%
   filter(Opponent %in% reg_opp$Opponent) %>%
@@ -231,15 +254,21 @@ df %>%
   geom_bar(stat = "identity",position = "fill", width = 0.6) +
   coord_flip() +
   labs(
-    title = "Results against the players he plays with most often",
+    title = "Results Against Players He Plays With Most Often",
     x = "Opponent",
-    y = "Win:Loss:Draw"
+    y = "Win : Loss : Draw"
   )
 ```
+Against the players he plays with most often, the result is usually a draw. His win-rates are 
+higher than his lose-rates except against Magnus Carlsen, the world champion.
 
-### which openings have higher winrates?
 
-
+### **11. Does the Opening Played Effect the Game Result?**
+#### **Performing a Cochran-Maentel-Haenszel Test**
+before doing the test, I filtered the data to include only openings that were played  
+atleast 20 times. The null hypothesis is that there is no relationship between 
+the opening played, the piece color, and the game result. The alternative hypothesis 
+is that there is a relationship. Alpha value is 0.05.
 ```{r}
 # openings with game number > 20
 freq_op <- df %>%
@@ -254,12 +283,12 @@ op_res <- df %>%
 
 # cochran-mantel-haenszel tes on op_res
 tb <- table(op_res$Color, op_res$Opening, op_res$Result)
-
-# H0 = opening & color have no effect on result
-# H1 = opening & color have an effect on result
 mantelhaen.test(tb)
-# reject null hypothesis 
+```
+The p-value is significantly lower than the alpha value. The null hypothesis is rejected.
 
+### **12. Which Openings Have the Highest Win-Rate Overall?**
+```{r}
 # top 10 op overal
 df %>%
   filter(Opening %in% op_res$Opening) %>%
@@ -275,14 +304,17 @@ df %>%
   coord_flip() +
   scale_y_continuous(limits = c(0, 100)) +
   labs(
-    title = "Top 10 Win-rates of Openings played by Hikaru Nakamura",
+    title = "Top 10 Win-Rates of Openings Overall",
     x = "Opening",
     y = "Win-rate in percentages(%)"
   )
+```
 
+### **12. Which Openings Have the Highest Win-Rate Grouped by Color?**
+```{r}
 # top 10 white op
-df %>%
-  filter(Opening %in% x$Opening) %>%
+opw <- df %>%
+  filter(Opening %in% op_res$Opening) %>%
   group_by(Color, Opening, Result) %>%
   summarise(Count = n()) %>%
   mutate(Winrate = round(Count / sum(Count) * 100, 2)) %>%
@@ -297,12 +329,12 @@ df %>%
   labs(
     title = "Top 10 Win-rates of Openings Played as White",
     x = "Opening",
-    y = "Win-rate in percentages(%)"
+    y = "Win-Rate in Percentages(%)"
   )
 
 # top 10 black op
-df %>%
-  filter(Opening %in% x$Opening) %>%
+opb <- df %>%
+  filter(Opening %in% op_res$Opening) %>%
   group_by(Color, Opening, Result) %>%
   summarise(Count = n()) %>%
   mutate(Winrate = round(Count / sum(Count) * 100, 2)) %>%
@@ -317,7 +349,9 @@ df %>%
   labs(
     title = "Top 10 Win-rates of Openings Played as Black",
     x = "Opening",
-    y = "Win-rate in percentages(%)"
+    y = "Win-Rate in Percentages(%)"
   )
+
+grid.arrange(opw, opb)
 ```
 
