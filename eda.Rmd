@@ -17,7 +17,6 @@ knitr::opts_chunk$set(message = FALSE)
 ```{r}
 library(readr)
 library(dplyr)
-library(magrittr)
 library(ggplot2)
 library(gridExtra)
 ```
