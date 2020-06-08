@@ -1,7 +1,7 @@
 ---
 title: "Exploratory Data Analysis of Hikaru Nakamura's Games"
 output: 
-  html_notebook:
+  html_document:
     toc: true
     toc_float: true
     toc_depth: 3
@@ -23,7 +23,7 @@ library(gridExtra)
 
 ## **Import and View Data**
 ```{r message = FALSE}
-df <- read_csv("cleaned_data.csv")
+df <- read_csv("../cleaned_data.csv")
 head(df)
 ```
 
