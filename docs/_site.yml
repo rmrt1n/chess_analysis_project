@@ -1,0 +1,6 @@
+name: "website"
+navbar:
+    title: "website"
+    left:
+      - text: "index"
+      - href: index.html
