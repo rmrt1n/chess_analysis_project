@@ -78,8 +78,8 @@ winrate %>%
     title = "Ratio of Wins, Losses & Draws Grouped by Color",
     y = "Win : Loss : Draw"
   ) +
+  guides(fill = guide_legend(reverse = TRUE)) +
   theme_light()
-
 ```
 His win-rate as white is `r w_wr` %, which is higher than his win-rate as black `r b_wr` %. 
 Win to loss to draw ratio is roughly the same as white or black.
@@ -104,7 +104,6 @@ head(overall_op, 10) %>%
     y = "Number of Games"
   ) +
   theme_light()
-
 ```
 
 ### **4. Which Openings Does He Play the Most Grouped by Color?**
@@ -140,7 +139,6 @@ black <- tail(top_by_color, 10) %>%
   ) +
   theme_light()
 
-
 grid.arrange(white, black)
 ```
 It looks like the most played opening is the sicilian defense for both white and black. This might happen 
@@ -171,9 +169,9 @@ vs_higher %>%
     title = "Ratio of Game Results Against & not Against Higher-Rated Opponents",
     x = "Against Higher-Rated Opponents?",
     y = "Win : Loss : Draw"
-  )  +
+  ) +
+  guides(fill = guide_legend(reverse = TRUE)) +
   theme_light()
-
 ```
 Against higher-rated opponents, nearly half of his games end in a draw. More specifically 
 `r highdraw` %. His win-rate is only slightly higher than his lose rate. On the other hand, 
@@ -195,7 +193,6 @@ df %>%
     y = "Count"
   ) +
   theme_light()
-
 ```
 The average number of moves of his games is `r avg_mv` moves.
 
@@ -214,7 +211,6 @@ df %>%
     y = "Average move count"
   ) +
   theme_light()
-
 ```
 The average move count is roughly the same for wins, losses, and draws. Number of moves is 
 unlikely to effect game results.
@@ -235,7 +231,6 @@ df %>%
     y = "Rating"
   ) +
   theme_light()
-
 
 max_rt <- max(df$Rating) %>% as.character()
 ```
@@ -262,7 +257,6 @@ reg_opp %>%
     y = "Number of games played"
   ) +
   theme_light()
-
 ```
 
 ### **10. What are Hikaru's Game Results Like Against Them?**
@@ -280,8 +274,8 @@ df %>%
     x = "Opponent",
     y = "Win : Loss : Draw"
   ) +
+  guides(fill = guide_legend(reverse = TRUE)) +
   theme_light()
-
 ```
 Against the players he plays with most often, the result is usually a draw. His win-rates are 
 higher than his lose-rates except against Magnus Carlsen, the world champion.
@@ -333,7 +327,6 @@ df %>%
     y = "Win-rate in percentages(%)"
   ) +
   theme_light()
-
 ```
 
 ### **12. Which Openings Have the Highest Win-Rate Grouped by Color?**
