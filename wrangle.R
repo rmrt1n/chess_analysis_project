@@ -1,24 +1,14 @@
----
-title: "wrangle scraped data"
-output: html_notebook
----
-
-### load libraries
-```{r message = FALSE}
+# load libraries
 library(readr)
 library(dplyr)
 library(tidyr)
 library(stringr)
-```
 
-### import & view data
-```{r message = FALSE, warning = FALSE}
+# import & view data
 df <- read_csv("scraped_data.csv")
 head(df)
-```
 
-### Tidy data
-```{r}
+# Tidy data
 df <- df %>%
   rename(White = "Player 1", Black = "Player 2") %>%
   separate(White, into = c("White", "White_rating"), sep = "  .*?(?=\\()") %>%
@@ -74,22 +64,7 @@ df <- df %>%
   mutate_at(c("Rating", "Opponent_rating"), as.numeric)
 
 head(df, 10)
-```
-#### New column descriptions:
-- Color =  Hikaru's piece color
-- Rating =  His rating at the time
-- Opponent = His opponent
-- Opponent_rating = His opponent's rating
-- Result = The result of the match:
-    * Win = Hikaru won the game
-    * Loss = Hikaru loss the game
-    * Draw = The game ends in a draw
-- Opening = the opening played in the game
-- Moves = The ammount of moves played
-- Year = The year the game is played
 
-
-### write to csv
-```{r}
+# write to csv
 write_csv(df, "cleaned_data.csv")
-```
+
