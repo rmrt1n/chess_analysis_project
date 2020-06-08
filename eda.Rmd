@@ -9,8 +9,12 @@ output:
     theme: paper
 ---
 
+```{r include = FALSE}
+knitr::opts_chunk$set(message = FALSE)
+```
+
 ## **Import Libraries**
-```{r echo = TRUE}
+```{r}
 library(readr)
 library(dplyr)
 library(magrittr)
@@ -46,7 +50,8 @@ overall_win %>%
   labs(
     title = "Comparison of number of wins, losses, and draws",
     x = "Result"
-  )
+  ) +
+  theme_light()
 ```
 His win percentage is `r wr` %. Out of `r ngame` games, `r wins` are wins, `r loss` are losses,
 and `r draw` are draws.  Most of his games end in either a win or a draw. 
@@ -73,7 +78,9 @@ winrate %>%
   labs(
     title = "Ratio of Wins, Losses & Draws Grouped by Color",
     y = "Win : Loss : Draw"
-  )
+  ) +
+  theme_light()
+
 ```
 His win-rate as white is `r w_wr` %, which is higher than his win-rate as black `r b_wr` %. 
 Win to loss to draw ratio is roughly the same as white or black.
@@ -96,7 +103,9 @@ head(overall_op, 10) %>%
     title = "Most Played Openings Overall",
     x = "Opening",
     y = "Number of Games"
-  )
+  ) +
+  theme_light()
+
 ```
 
 ### **4. Which Openings Does He Play the Most Grouped by Color?**
@@ -116,7 +125,9 @@ white <- head(top_by_color, 10) %>%
     title = "Most Played Openings as White",
     x = "Openings",
     y = "Number of Games"
-  )
+  ) +
+  theme_light()
+
 
 # top 10 most played openings by black
 black <- tail(top_by_color, 10) %>%
@@ -127,7 +138,9 @@ black <- tail(top_by_color, 10) %>%
     title = "Most Played Openings as Black",
     x = "Openings",
     y = "Number of Games"
-  )
+  ) +
+  theme_light()
+
 
 grid.arrange(white, black)
 ```
@@ -159,7 +172,9 @@ vs_higher %>%
     title = "Ratio of Game Results Against & not Against Higher-Rated Opponents",
     x = "Against Higher-Rated Opponents?",
     y = "Win : Loss : Draw"
-  ) 
+  )  +
+  theme_light()
+
 ```
 Against higher-rated opponents, nearly half of his games end in a draw. More specifically 
 `r highdraw` %. His win-rate is only slightly higher than his lose rate. On the other hand, 
@@ -169,7 +184,7 @@ Against higher-rated opponents, nearly half of his games end in a draw. More spe
 ### **6. What is the Average Move Count in his Games?**
 ```{r}
 # avg number of moves
-avg_mv <- round(mean(df$Moves), 2) %>% as.character()
+avg_mv <- round(mean(df$Moves)) %>% as.character()
 
 # move count distribution
 df %>%
@@ -179,7 +194,9 @@ df %>%
     title = "Distribution of Number of Moves in a Game",
     x = "Number of Moves",
     y = "Count"
-  )
+  ) +
+  theme_light()
+
 ```
 The average number of moves of his games is `r avg_mv` moves.
 
@@ -196,7 +213,9 @@ df %>%
     title = "Average move counts of different game results",
     x = "Results",
     y = "Average move count"
-  )
+  ) +
+  theme_light()
+
 ```
 The average move count is roughly the same for wins, losses, and draws. Number of moves is 
 unlikely to effect game results.
@@ -215,7 +234,9 @@ df %>%
   labs(
     title = "Yearly Highest Rating from 2003 to mid 2020",
     y = "Rating"
-  )
+  ) +
+  theme_light()
+
 
 max_rt <- max(df$Rating) %>% as.character()
 ```
@@ -240,7 +261,9 @@ reg_opp %>%
     title = "Top 10 Players He Plays with Most Often",
     x = "Opponent",
     y = "Number of games played"
-  )
+  ) +
+  theme_light()
+
 ```
 
 ### **10. What are Hikaru's Game Results Like Against Them?**
@@ -257,7 +280,9 @@ df %>%
     title = "Results Against Players He Plays With Most Often",
     x = "Opponent",
     y = "Win : Loss : Draw"
-  )
+  ) +
+  theme_light()
+
 ```
 Against the players he plays with most often, the result is usually a draw. His win-rates are 
 higher than his lose-rates except against Magnus Carlsen, the world champion.
@@ -307,7 +332,9 @@ df %>%
     title = "Top 10 Win-Rates of Openings Overall",
     x = "Opening",
     y = "Win-rate in percentages(%)"
-  )
+  ) +
+  theme_light()
+
 ```
 
 ### **12. Which Openings Have the Highest Win-Rate Grouped by Color?**
@@ -330,7 +357,9 @@ opw <- df %>%
     title = "Top 10 Win-rates of Openings Played as White",
     x = "Opening",
     y = "Win-Rate in Percentages(%)"
-  )
+  ) +
+  theme_light()
+
 
 # top 10 black op
 opb <- df %>%
@@ -350,7 +379,8 @@ opb <- df %>%
     title = "Top 10 Win-rates of Openings Played as Black",
     x = "Opening",
     y = "Win-Rate in Percentages(%)"
-  )
+  ) +
+  theme_light()
 
 grid.arrange(opw, opb)
 ```
