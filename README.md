@@ -42,10 +42,8 @@ columns:
   
 ## Findings  
 
-Here are some of my findings after performing the analysis. The rest of the analyses and visualizations are in [eda.Rmd](https://github.com/rmrt1n/chess_analysis_project/blob/master/eda.Rmd).  
+Here are some of my findings after performing the analysis. The rest of the analyses and visualizations are in [eda.Rmd](https://github.com/rmrt1n/chess_analysis_project/blob/master/eda.Rmd).
 
-![alt text](https://github.com/rmrt1n/chess_analysis_project/blob/master/vs_high.png "Results against higher-rate opponents")
-![alt text](https://github.com/rmrt1n/chess_analysis_project/blob/master/top10_opp.png "Top 10 most-faced opponents")
-![alt text](https://github.com/rmrt1n/chess_analysis_project/blob/master/opp_res.png "Results against them")
-
-
+<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/top10_opp.png" alt="top 10 most faced opponent" height="400"/> 
+<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/opp_res.png" alt="Results against frequently faced opponent" height="400">
+<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/vs_high.png" alt="Results against higher-rated opponents" height="400"/> 
