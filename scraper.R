@@ -17,14 +17,14 @@ scrape <- function(url) {
              into = c("Player 1", "Player 2"),
              sep = "(?<=\\)).*?(?=[A-Z])")
 
-  if (file.exists("scraped_data.csv") == FALSE) {
-    write.table(df, "scraped_data.csv",
+  if (file.exists("data/scraped_data.csv") == FALSE) {
+    write.table(df, "data/scraped_data.csv",
       sep = ",",
       row.names = FALSE,
       col.names = TRUE
     )
   } else {
-    write.table(df, "scraped_data.csv",
+    write.table(df, "data/scraped_data.csv",
       sep = ",",
       row.names = FALSE,
       col.names = FALSE,

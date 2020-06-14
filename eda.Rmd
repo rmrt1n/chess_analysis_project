@@ -23,7 +23,7 @@ library(gridExtra)
 
 ## **Import and View Data**
 ```{r message = FALSE}
-df <- read_csv("cleaned_data.csv")
+df <- read_csv("data/cleaned_data.csv")
 head(df)
 ```
 

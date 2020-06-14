@@ -5,7 +5,7 @@ library(tidyr)
 library(stringr)
 
 # import & view data
-df <- read_csv("scraped_data.csv")
+df <- read_csv("data/scraped_data.csv")
 head(df)
 
 # Tidy data
@@ -66,5 +66,5 @@ df <- df %>%
 head(df, 10)
 
 # write to csv
-write_csv(df, "cleaned_data.csv")
+write_csv(df, "data/cleaned_data.csv")
 
