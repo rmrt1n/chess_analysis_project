@@ -44,6 +44,6 @@ columns:
 
 Here are some of my findings after performing the analysis. The full analysis is located [here](https://rmrt1n.github.io/chess_eda.html).
 
-<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/data/top10_opp.png" alt="top 10 most faced opponent" height="400"/> 
-<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/data/opp_res.png" alt="Results against frequently faced opponent" height="400">
-<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/data/vs_high.png" alt="Results against higher-rated opponents" height="400"/> 
+<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/images/top10_opp.png" alt="top 10 most faced opponent" height="400"/> 
+<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/images/opp_res.png" alt="Results against frequently faced opponent" height="400">
+<img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/images/vs_high.png" alt="Results against higher-rated opponents" height="400"/> 
