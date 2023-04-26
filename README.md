@@ -47,3 +47,7 @@ Here are some of my findings after performing the analysis. The full analysis is
 <img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/images/top10_opp.png" alt="top 10 most faced opponent" height="400"/> 
 <img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/images/opp_res.png" alt="Results against frequently faced opponent" height="400">
 <img src="https://github.com/rmrt1n/chess_analysis_project/blob/master/images/vs_high.png" alt="Results against higher-rated opponents" height="400"/> 
+
+## License
+Distributed under the MIT License. See [LICENSE](/LICENSE) for more information.
+
